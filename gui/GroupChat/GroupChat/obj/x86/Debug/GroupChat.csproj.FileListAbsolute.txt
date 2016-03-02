@@ -1,0 +1,9 @@
+F:\project\gui\GroupChat\GroupChat\bin\Debug\GroupChat.exe
+F:\project\gui\GroupChat\GroupChat\bin\Debug\GroupChat.pdb
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.Form1.resources
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.Properties.Resources.resources
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.exe
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.pdb
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.FrmUsers.resources
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.csprojResolveAssemblyReference.cache
+F:\project\gui\GroupChat\GroupChat\obj\x86\Debug\GroupChat.csproj.GenerateResource.Cache
