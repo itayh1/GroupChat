@@ -1,0 +1,11 @@
+c:\users\user\documents\visual studio 2010\projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+c:\users\user\documents\visual studio 2010\projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+c:\users\user\documents\visual studio 2010\projects\ConsoleApplication1\ConsoleApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\users\user\documents\visual studio 2010\projects\ConsoleApplication1\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.exe
+c:\users\user\documents\visual studio 2010\projects\ConsoleApplication1\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.pdb
+F:\project\ConsoleApplication1\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.exe
+F:\project\ConsoleApplication1\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.pdb
+F:\project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+F:\project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+F:\project\ConsoleApplication1\ConsoleApplication1\obj\x86\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
+F:\project\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
