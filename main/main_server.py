@@ -6,9 +6,10 @@ import os
 import Queue
 import hashlib
 import json
+import threading
 
 class main:
-    def __init__(self,port=7979):
+    def __init__(self,port=8080):
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         self.sock.bind(('127.0.0.1',port))
         self.sock.listen(100)
@@ -22,14 +23,14 @@ class main:
         self.output = [ ]
         self.msg_queue = {}
         
-        while running:
-            rlist , wlist , xlist = select.select(self.sock_list,[],[])
+        while self.running:
+            rlist , wlist , xlist = select.select(self.sock_list,self.output,[])
             for s in rlist:
                 
                 if s is self.sock:
                     conn, addr = s.accept()
                     conn.setblocking(0)
-                    sock_list.append(conn)
+                    self.sock_list.append(conn)
                     self.msg_queue[conn] = Queue.Queue()
                     print "-- new connection from %s \n" %str(addr)
 
@@ -43,7 +44,7 @@ class main:
                                 break
                         self.msg_queue[s].put(data)
                         if s not in self.output:
-                            output.append(s)
+                            self.output.append(s)
                     else:
                         print 'you got am empty socket'
                         if s in output:
@@ -58,11 +59,17 @@ class main:
                     print 'output queue for '+s.getpeername+' is empty'
                     output.remove(s)
                 else:
-                    response = Parser(pkt,s)
+                    response = self.Parser(pkt,s)
+                    s.send(response)
 
-
+    #voice_req = ["voice" , "join/create" , room_name , user_name ]
+    #msg_req = ["msg" , name , group , hash , message ]
+    #users = [( name , group , adress , hash )]
+    #disconnect_req = ["disconnect" , name , hash ]
     def Parser(self,data,conn):
         req = data.split(',') #split data to request
+        if req[3]=="":
+            return "err,invalid"
         if req[0]=='voice': #voice chat request
             if req[1]=='join': #req to join to existing room
                 if self.users.has_key(req[2]): #is room exist
@@ -79,18 +86,56 @@ class main:
                 return "err,invalid"
             code=hashlib.md5()
             code.update(str(req[2]+req[3]))
-            self.users[req[2]].append((req[3],req[2],conn.getpeername()[0],code.hexdigest()))
             self.db.new_user(req[3],req[2],conn.getpeername()[0],code.hexdigest())
-            other_users = [ {'name':u[0],'ip':u[2]} for u in self.users[req[2]] if u[0]!=req[3]]
-            return str("ok,"+json.dumps(other_users))
+            if req[1]=="join":
+                self.users[req[2]].append((req[3],req[2],conn.getpeername()[0],code.hexdigest()))
+                other_users = [ {'name':u[0],'ip':u[2]} for u in self.users[req[2]] if u[0]!=req[3]]
+                return str("ok,"+json.dumps(other_users))
+            else:
+                self.users[req[2]] = []
+                self.users[req[2]].append((req[3],req[2],conn.getpeername()[0],code.hexdigest()))                
+                return str("ok,")
+            
+            
         
         elif req[0]=='msg': #message request
             if self.users.has_key(req[2]):
                 index = [ p for p in self.users[req[2]] if p[0]==req[1]]
                 if len(index)==1:
                     if req[3]==index[3]:
-                        return "sent,"+req[4]+","+str(self.users[req[2]])
+                        adresses = [ p[2] for p in self.users[req[2]] ]
+                        t = threading.Thread(target=self.Msg_sender,args=(adresses,req[4]))
+                        t.start()
+                        return "sent,"
+            return "err,invalid"
 
+        elif req[0]=='disconnect':
+            if self.users.has_key(req[2]):
+                user = [ p for p in self.users[req[2]] if p[0]==req[1] and p[3]==req[3]]
+                if len(user)==1:
+                    self.users[req[2]].remove(user[0])
+                    self.sock_list.remove(conn)
+                    self.output.remove(conn)
+                    self.db.del_user(user[0][0],user[0][3])
+                    adresses = [ p[2] for p in self.users[req[2]] ]                    
+                    t = threading.Thread(target=self.Disconnect_Sender,args=(adresses,user[0][0]))
+                    t.start()
+                    return str('ok,')
+            return 'err,invalid'
+                    
+            
+    def Disconnect_Sender(self,adresses,name):
+        connections = [ c for c in self.sock_list if c.getpeername() in adresses]
+        for conn in connections:
+            conn.send("diconnect,"+name)
+        
+
+    def Msg_sender(self,adresses,msg):
+        connections = [ c for c in self.sock_list if c.getpeername() in adresses]
+        for conn in connections:
+            conn.send('msg,"'+msg+'",end')
+
+#self.users[ (u_name,g_name,adress,hash_code) ]
 class DB_manager:
     def __init__(self,DBname):
         self.conn = sqlite3.connect(str(DBname)+'.db')
@@ -129,6 +174,6 @@ class DB_manager:
     def close(self):
         self.c.close()
         self.conn.close()
-        
-a=DB_manager('a')
-a.new_user('Itay','joker','1234','d15f34sd5f')
+
+m=main()
+m.Handler()
